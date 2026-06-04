@@ -462,3 +462,75 @@ animation:fadePage .4s ease;
 from{opacity:0;transform:translateY(15px);}
 to{opacity:1;}
 }
+/* ======================
+   MOBILE / ANDROID RESPONSIVENESS
+====================== */
+@media (max-width: 768px) {
+    /* Stack the main layout instead of side-by-side */
+    .dashboard {
+        flex-direction: column;
+    }
+
+    /* Convert the sidebar into a scrollable top navigation */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 10;
+    }
+    
+    .sidebar ul {
+        display: flex;
+        overflow-x: auto; /* Allows horizontal swiping */
+        gap: 10px;
+        padding-bottom: 5px;
+    }
+
+    .sidebar li {
+        flex-shrink: 0;
+        margin-bottom: 0;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    /* Adjust main content padding */
+    .main {
+        padding: 20px 5%;
+    }
+
+    /* Stack summary cards vertically */
+    .cards {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Make grids single-column */
+    .dashboard-grid, 
+    .quick-add-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Ensure inputs fit the screen */
+    .input-field.full-width {
+        grid-column: 1; 
+    }
+    
+    .add-btn {
+        grid-column: 1;
+    }
+
+    /* Adjust the AI Chatbot for mobile */
+    .chat-container {
+        width: 90%;
+        right: 5%;
+        bottom: 80px;
+    }
+
+    #aiBtn {
+        bottom: 20px;
+        right: 20px;
+    }
+}
