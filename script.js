@@ -76,14 +76,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             location.reload();
         };
 
-        window.resetData = async () => {
-            if (confirm("Warning: This will delete all your data permanently. Continue?")) {
-                const { data: { user } } = await supabase.auth.getUser();
-                await supabase.from('transactions').delete().eq('user_id', user.id);
-                localStorage.clear();
-                location.href = "home.html";
-            }
-        };
+       window.resetData = async () => {
+    if (confirm("Warning: This will delete all your transactions permanently. Continue?")) {
+        try {
+            // 1. Verify user session
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) throw new Error("Could not verify user session.");
+
+            // 2. Delete from DB and actively catch errors
+            const { error: deleteError } = await supabase
+                .from('transactions')
+                .delete()
+                .eq('user_id', user.id);
+            
+            if (deleteError) throw deleteError;
+
+            // 3. Clear ONLY your app's specific UI preferences
+            // This prevents wiping out the crucial Supabase auth tokens
+            localStorage.removeItem("budget");
+            localStorage.removeItem("goalName");
+            localStorage.removeItem("goalAmount");
+            localStorage.removeItem("currency");
+
+            // 4. Clear the active arrays and update UI dynamically
+            data = [];
+            updateAllUI();
+            
+            alert("All data cleared successfully.");
+            
+            // Stay on dashboard instead of kicking to home
+            window.location.href = "index.html"; 
+
+        } catch (error) {
+            console.error("Reset Error:", error);
+            alert("Failed to delete data: " + error.message);
+        }
+    }
+};
     }
 
     /* ================= LOGOUT ================= */
