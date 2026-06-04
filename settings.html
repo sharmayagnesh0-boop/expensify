@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <script>if(localStorage.getItem("theme") === "true") document.body.classList.add("light");</script>
+
     <div class="dashboard">
         <div class="sidebar">
             <h2>Expensify</h2>
@@ -39,28 +41,26 @@
             </div>
             <button onclick="saveSettings()" class="add-btn" style="width:100%; margin-top:20px">Update Profile</button>
         </div>
+        
         <button onclick="toggleTheme()" style="margin-top:20px;width:100%">
-🌗 Toggle Dark / Light Mode
-</button>
+        🌗 Toggle Dark / Light Mode
+        </button>
 
         <div class="glass-box">
             <h3>🧹 Danger Zone</h3>
             <p style="font-size:12px; opacity:0.6; margin-bottom:20px">Warning: These actions cannot be undone.</p>
             <button onclick="resetData()" style="background:#ef4444; width:100%">Clear All Data</button>
-            <button onclick="logout()" 
-style="margin-top:15px;background:#ef4444;width:100%">
-🚪 Logout
-</button>
+            <button onclick="logout()" style="margin-top:15px;background:#ef4444;width:100%">
+            🚪 Logout
+            </button>
         </div>
     </div>
 </div>
     </div>
     
-
     <script src="script.js"></script>
-    <!-- ================= LOGOUT MODAL ================= -->
 
-<div id="logoutModal" class="modal">
+    <div id="logoutModal" class="modal">
   <div class="modal-box">
     <h3>Confirm Logout</h3>
     <p style="opacity:.7;font-size:14px">
