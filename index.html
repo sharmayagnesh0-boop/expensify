@@ -8,16 +8,13 @@
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-
-
 <div class="dashboard">
 
-<!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
 <h2>Expensify</h2>
 <ul>
@@ -28,19 +25,15 @@
 </ul>
 </div>
 
-<!-- ================= MAIN ================= -->
 <div class="main">
 
-<!-- AI Button -->
 <button id="aiBtn" onclick="toggleChat()">🤖 AI Assistant</button>
 
-<!-- SMART HEADER -->
 <div class="smart-header">
 <h2 id="userGreeting">Welcome</h2>
 <p id="liveDateTime"></p>
 </div>
 
-<!-- ================= TOP CARDS ================= -->
 <div class="cards">
 
 <div class="card balance">
@@ -70,13 +63,10 @@
 
 </div>
 
-<!-- ================= GRID ================= -->
 <div class="dashboard-grid">
 
-<!-- ===== LEFT COLUMN ===== -->
 <div class="grid-left">
 
-<!-- QUICK ADD -->
 <div class="glass-box">
 <h3>⚡ Quick Add Transaction</h3>
 
@@ -111,7 +101,6 @@
 </div>
 </div>
 
-<!-- MONTHLY BUDGET -->
 <div class="glass-box">
 <div class="budget-header">
 <h3>📊 Monthly Budget Progress</h3>
@@ -127,10 +116,8 @@
 
 </div>
 
-<!-- ===== RIGHT COLUMN ===== -->
 <div class="grid-right">
 
-<!-- SMART INSIGHT -->
 <div class="glass-box">
 <h3>💡 Smart Insight</h3>
 <p id="insightText">
@@ -138,7 +125,6 @@ You're doing great! Check analytics for deeper insights.
 </p>
 </div>
 
-<!-- FINANCIAL GOAL (MOVED RIGHT) -->
 <div class="glass-box">
 <h3>🎯 Financial Goal</h3>
 
@@ -165,7 +151,6 @@ Save Goal
 </div>
 </div>
 
-<!-- ================= AI CHAT ================= -->
 <div id="aiChat" class="chat-container">
 
 <div class="chat-header">
@@ -186,7 +171,6 @@ Hello 👋 I am your Finance AI. Ask me anything!
 
 </div>
 
-<!-- ================= LOGOUT MODAL ================= -->
 <div id="logoutModal" class="modal">
 <div class="modal-box">
 <h3>Confirm Logout</h3>
