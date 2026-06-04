@@ -134,22 +134,48 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        let csv = "Name,Amount,Date\n";
+        // 1. Create Professional Headers
+        let csv = "Transaction ID,Date,Type,Category,Description,Amount,Currency\n";
+
+        // 2. Format Each Row
         data.forEach(t => {
-            csv += `"${t.text}",${t.amount},"${t.date}"\n`;
+            // Extract the category emoji and the actual text
+            const firstSpaceIndex = t.text.indexOf(" ");
+            let category = "N/A";
+            let description = t.text;
+
+            // Split the emoji from the text
+            if (firstSpaceIndex !== -1) {
+                category = t.text.substring(0, firstSpaceIndex);
+                description = t.text.substring(firstSpaceIndex + 1);
+            }
+
+            // Determine if it is Income or Expense
+            const type = t.amount > 0 ? "Income" : "Expense";
+            
+            // Make amount a clean positive number for standard accounting
+            const cleanAmount = Math.abs(t.amount);
+
+            // Append row to CSV (wrapping strings in quotes prevents commas from breaking columns)
+            csv += `"${t.id}","${t.date}","${type}","${category}","${description}",${cleanAmount},"${currency}"\n`;
         });
 
-        const blob = new Blob([csv], { type: "text/csv" });
+        // 3. Trigger Download with a professional timestamped filename
+        const exportDate = new Date().toISOString().split('T')[0]; // Gets YYYY-MM-DD
+        const fileName = `Expensify_Report_${exportDate}.csv`;
+
+        // The "\uFEFF" forces Excel to read Emojis correctly
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); 
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
+        
         a.href = url;
-        a.download = "transactions.csv";
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     };
-
     /* ================= DASHBOARD CORE (INSERT / UPDATE / DELETE) ================= */
     window.addTransaction = async () => {
         const text = document.getElementById("text")?.value.trim();
