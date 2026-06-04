@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expensify - Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>Expensify</h2>
+            <ul>
+                <li onclick="location.href='index.html'">🏠 Dashboard</li>
+                <li onclick="location.href='transactions.html'">📜 Transactions</li>
+                <li onclick="location.href='analytics.html'">📊 Analytics</li>
+                <li class="active" onclick="location.href='settings.html'">⚙️ Settings</li>
+            </ul>
+        </div>
+
+        <div class="main">
+    <h1>System Settings</h1>
+    <div class="dashboard-grid">
+        <div class="glass-box">
+            <h3>📈 Financial Goals</h3>
+            <div class="input-field" style="margin-top:15px">
+                <label>Monthly Budget Limit</label>
+                <input type="number" id="budgetInput" placeholder="e.g. 50000">
+            </div>
+            <div class="input-field" style="margin-top:15px">
+                <label>Preferred Currency</label>
+                <select id="currencySelect">
+                    <option value="₹">INR (₹)</option>
+                    <option value="$">USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                </select>
+            </div>
+            <button onclick="saveSettings()" class="add-btn" style="width:100%; margin-top:20px">Update Profile</button>
+        </div>
+        <button onclick="toggleTheme()" style="margin-top:20px;width:100%">
+🌗 Toggle Dark / Light Mode
+</button>
+
+        <div class="glass-box">
+            <h3>🧹 Danger Zone</h3>
+            <p style="font-size:12px; opacity:0.6; margin-bottom:20px">Warning: These actions cannot be undone.</p>
+            <button onclick="resetData()" style="background:#ef4444; width:100%">Clear All Data</button>
+            <button onclick="logout()" 
+style="margin-top:15px;background:#ef4444;width:100%">
+🚪 Logout
+</button>
+        </div>
+    </div>
+</div>
+    </div>
+    
+
+    <script src="script.js"></script>
+    <!-- ================= LOGOUT MODAL ================= -->
+
+<div id="logoutModal" class="modal">
+  <div class="modal-box">
+    <h3>Confirm Logout</h3>
+    <p style="opacity:.7;font-size:14px">
+      Are you sure you want to logout?
+    </p>
+
+    <div class="modal-actions">
+      <button onclick="confirmLogout()">Yes, Logout</button>
+      <button onclick="closeLogoutModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

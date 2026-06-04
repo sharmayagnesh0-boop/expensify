@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Transactions</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h2>Expensify</h2>
+<ul>
+<li onclick="location.href='index.html'">🏠 Dashboard</li>
+<li class="active">📜 Transactions</li>
+<li onclick="location.href='analytics.html'">📊 Analytics</li>
+<li onclick="location.href='settings.html'">⚙️ Settings</li>
+</ul>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h1>💳 Transactions Center</h1>
+
+<!-- SUMMARY -->
+<div class="cards">
+<div class="card">
+<h3>Total Transactions</h3>
+<p id="totalCount">0</p>
+</div>
+
+<div class="card income">
+<h3>Income Entries</h3>
+<p id="incomeCount">0</p>
+</div>
+
+<div class="card expense">
+<h3>Expense Entries</h3>
+<p id="expenseCount">0</p>
+</div>
+</div>
+
+<!-- SEARCH + FILTER -->
+<div class="glass-box">
+
+<input 
+id="searchInput"
+placeholder="🔍 Search transaction..."
+style="width:60%;margin-right:10px">
+
+<select id="filterType">
+<option value="all">All</option>
+<option value="income">Income</option>
+<option value="expense">Expense</option>
+</select>
+
+</div>
+
+
+<!-- LIST -->
+<button onclick="exportData()">⬇ Export CSV</button>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+
+<div class="modal-box">
+
+<h3>Edit Transaction</h3>
+
+<input id="editText" placeholder="Transaction name">
+
+<input id="editAmount" type="number" placeholder="Amount">
+
+<select id="editCategory">
+<option value="💰">General</option>
+<option value="🍔">Food</option>
+<option value="🏠">Home</option>
+<option value="🚗">Transport</option>
+<option value="🎬">Entertainment</option>
+<option value="🛍️">Shopping</option>
+</select>
+
+<div class="modal-actions">
+<button onclick="updateTransaction()">Save</button>
+<button onclick="closeModal()">Cancel</button>
+</div>
+
+</div>
+</div>
+<!-- ================= LOGOUT MODAL ================= -->
+
+<div id="logoutModal" class="modal">
+  <div class="modal-box">
+    <h3>Confirm Logout</h3>
+    <p style="opacity:.7;font-size:14px">
+      Are you sure you want to logout?
+    </p>
+
+    <div class="modal-actions">
+      <button onclick="confirmLogout()">Yes, Logout</button>
+      <button onclick="closeLogoutModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

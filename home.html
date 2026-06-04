@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expensify - Premium Finance</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:#020617;
+color:white;
+overflow-x:hidden;
+}
+
+/* Background Glow */
+.bg span{
+position:absolute;
+width:700px;
+height:700px;
+border-radius:50%;
+filter:blur(150px);
+opacity:.5;
+animation:float 25s infinite alternate ease-in-out;
+}
+
+.bg span:nth-child(1){
+background:#2563eb;
+top:-200px;
+left:-200px;
+}
+
+.bg span:nth-child(2){
+background:#9333ea;
+bottom:-200px;
+right:-200px;
+}
+
+@keyframes float{
+from{transform:translate(0,0);}
+to{transform:translate(120px,-120px);}
+}
+
+/* NAVBAR */
+.navbar{
+display:flex;
+justify-content:space-between;
+padding:25px 8%;
+position:fixed;
+width:100%;
+background:rgba(0,0,0,.3);
+backdrop-filter:blur(20px);
+}
+
+.logo{
+font-weight:700;
+font-size:22px;
+background:linear-gradient(90deg,#38bdf8,#9333ea);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.navbar button{
+background:linear-gradient(90deg,#38bdf8,#2563eb);
+border:none;
+padding:10px 22px;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+/* HERO */
+.hero{
+display:flex;
+align-items:center;
+justify-content:space-between;
+min-height:100vh;
+padding:0 8%;
+gap:60px;
+}
+
+.hero-left h1{
+font-size:64px;
+line-height:1.1;
+}
+
+.hero-left span{
+background:linear-gradient(90deg,#38bdf8,#9333ea);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.hero-buttons{
+margin-top:40px;
+display:flex;
+gap:20px;
+}
+
+.primary{
+background:linear-gradient(90deg,#38bdf8,#2563eb);
+padding:15px 35px;
+border:none;
+border-radius:12px;
+font-weight:600;
+color:white;
+cursor:pointer;
+}
+
+.secondary{
+background:transparent;
+border:1px solid #38bdf8;
+padding:15px 35px;
+border-radius:12px;
+color:#38bdf8;
+cursor:pointer;
+}
+
+/* MOCKUP */
+.mockup{
+background:rgba(255,255,255,.05);
+padding:40px;
+border-radius:24px;
+width:420px;
+}
+
+.mock-card{
+background:rgba(255,255,255,.08);
+padding:20px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+/* ================= PREVIEW MODAL ================= */
+
+.preview-modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.7);
+backdrop-filter:blur(8px);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:100;
+}
+
+.preview-box{
+width:700px;
+max-width:90%;
+max-height:90vh;
+overflow:auto;
+padding:40px;
+border-radius:24px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(25px);
+text-align:center;
+position:relative;
+}
+
+.close-preview{
+position:absolute;
+right:20px;
+top:15px;
+cursor:pointer;
+font-size:22px;
+}
+
+.preview-cards{
+display:flex;
+gap:20px;
+margin:25px 0;
+}
+
+.preview-card{
+flex:1;
+background:rgba(255,255,255,.07);
+padding:20px;
+border-radius:14px;
+}
+
+canvas{
+max-height:300px !important;
+}
+
+.footer{
+text-align:center;
+padding:80px;
+opacity:.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg">
+<span></span>
+<span></span>
+</div>
+
+<div class="navbar">
+<div class="logo">💰 Expensify</div>
+<button onclick="location.href='login.html'">Login</button>
+</div>
+
+<section class="hero">
+
+<div class="hero-left">
+<h1>Next-Gen <span>Finance Control</span></h1>
+
+<p>Experience a premium expense tracking dashboard with real-time analytics.</p>
+
+<div class="hero-buttons">
+<button class="primary" onclick="location.href='login.html'">Get Started</button>
+<button class="secondary" onclick="openPreview()">Live Preview</button>
+</div>
+</div>
+
+<div class="mockup">
+<div class="mock-card"><h3>Total Balance</h3><p>₹25,400</p></div>
+<div class="mock-card"><h3>Income</h3><p>₹40,000</p></div>
+<div class="mock-card"><h3>Expense</h3><p>₹14,600</p></div>
+</div>
+
+</section>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="preview-modal">
+
+<div class="preview-box">
+
+<span class="close-preview" onclick="closePreview()">✕</span>
+
+<h2>Expensify Live Preview</h2>
+
+<div class="preview-cards">
+<div class="preview-card"><p>Balance</p><h3 id="demoBalance">₹0</h3></div>
+<div class="preview-card"><p>Income</p><h3 id="demoIncome">₹0</h3></div>
+<div class="preview-card"><p>Expense</p><h3 id="demoExpense">₹0</h3></div>
+</div>
+
+<canvas id="previewChart"></canvas>
+
+<br><br>
+
+<button class="primary" onclick="enterApp()">Enter Full App →</button>
+
+</div>
+</div>
+
+<div class="footer">
+© 2026 Expensify — Premium UI
+</div>
+
+<script>
+
+let demoChart;
+
+function openPreview(){
+document.getElementById("previewModal").style.display="flex";
+animateNumbers();
+loadChart();
+}
+
+function closePreview(){
+document.getElementById("previewModal").style.display="none";
+}
+
+function enterApp(){
+
+localStorage.setItem("auth","true");
+
+localStorage.setItem("finovaPro",JSON.stringify([
+{text:"💰 Salary",amount:50000,date:new Date().toLocaleDateString()},
+{text:"🍔 Food",amount:-1500,date:new Date().toLocaleDateString()},
+{text:"🛍️ Shopping",amount:-3500,date:new Date().toLocaleDateString()}
+]));
+
+window.location="index.html";
+}
+
+/* NUMBER ANIMATION */
+function animateNumbers(){
+animate("demoBalance",45000);
+animate("demoIncome",60000);
+animate("demoExpense",15000);
+}
+
+function animate(id,value){
+
+let el=document.getElementById(id);
+let start=0;
+
+let interval=setInterval(()=>{
+start+=value/30;
+if(start>=value){
+start=value;
+clearInterval(interval);
+}
+el.innerText="₹"+Math.floor(start);
+},20);
+}
+
+/* CHART FIXED SIZE */
+function loadChart(){
+
+const ctx=document.getElementById("previewChart");
+
+if(demoChart) demoChart.destroy();
+
+demoChart=new Chart(ctx,{
+type:'doughnut',
+data:{
+labels:['Income','Expense'],
+datasets:[{
+data:[60000,15000],
+backgroundColor:['#22c55e','#ef4444'],
+borderWidth:0
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{labels:{color:"#fff"}}
+}
+}
+});
+}
+
+</script>
+
+</body>
+</html>

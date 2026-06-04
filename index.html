@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expensify Pro</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+<script>
+if(!localStorage.getItem("auth")){
+window.location="login.html";
+}
+</script>
+
+<div class="dashboard">
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+<h2>Expensify</h2>
+<ul>
+<li class="active" onclick="location.href='index.html'">🏠 Dashboard</li>
+<li onclick="location.href='transactions.html'">📜 Transactions</li>
+<li onclick="location.href='analytics.html'">📊 Analytics</li>
+<li onclick="location.href='settings.html'">⚙️ Settings</li>
+</ul>
+</div>
+
+<!-- ================= MAIN ================= -->
+<div class="main">
+
+<!-- AI Button -->
+<button id="aiBtn" onclick="toggleChat()">🤖 AI Assistant</button>
+
+<!-- SMART HEADER -->
+<div class="smart-header">
+<h2 id="userGreeting">Welcome</h2>
+<p id="liveDateTime"></p>
+</div>
+
+<!-- ================= TOP CARDS ================= -->
+<div class="cards">
+
+<div class="card balance">
+<h3>Total Balance</h3>
+<p id="balance">₹0</p>
+</div>
+
+<div class="card income">
+<h3>Monthly Income</h3>
+<p id="income">₹0</p>
+</div>
+
+<div class="card expense">
+<h3>Monthly Expense</h3>
+<p id="expense">₹0</p>
+</div>
+
+<div class="card">
+<h3>🔥 Saving Streak</h3>
+<p id="streak">0 Days</p>
+</div>
+
+<div class="card">
+<h3>⭐ Finance Score</h3>
+<p id="financeScore">0/100</p>
+</div>
+
+</div>
+
+<!-- ================= GRID ================= -->
+<div class="dashboard-grid">
+
+<!-- ===== LEFT COLUMN ===== -->
+<div class="grid-left">
+
+<!-- QUICK ADD -->
+<div class="glass-box">
+<h3>⚡ Quick Add Transaction</h3>
+
+<div class="quick-add-grid">
+
+<div class="input-field">
+<label>Transaction Name</label>
+<input id="text" placeholder="e.g., Starbucks">
+</div>
+
+<div class="input-field">
+<label>Amount (₹)</label>
+<input id="amount" type="number" placeholder="500">
+</div>
+
+<div class="input-field full-width">
+<label>Category</label>
+<select id="category">
+<option value="💰">General</option>
+<option value="🍔">Food & Dining</option>
+<option value="🏠">Rent/Home</option>
+<option value="🚗">Transport</option>
+<option value="🎬">Entertainment</option>
+<option value="🛍️">Shopping</option>
+</select>
+</div>
+
+<button onclick="addTransaction()" class="add-btn">
++ Add Transaction
+</button>
+
+</div>
+</div>
+
+<!-- MONTHLY BUDGET -->
+<div class="glass-box">
+<div class="budget-header">
+<h3>📊 Monthly Budget Progress</h3>
+<span id="budgetPercent">0%</span>
+</div>
+
+<div class="progress-container">
+<div id="progressBar" class="progress-bar"></div>
+</div>
+
+<p id="budgetStatus">Set limit in settings.</p>
+</div>
+
+</div>
+
+<!-- ===== RIGHT COLUMN ===== -->
+<div class="grid-right">
+
+<!-- SMART INSIGHT -->
+<div class="glass-box">
+<h3>💡 Smart Insight</h3>
+<p id="insightText">
+You're doing great! Check analytics for deeper insights.
+</p>
+</div>
+
+<!-- FINANCIAL GOAL (MOVED RIGHT) -->
+<div class="glass-box">
+<h3>🎯 Financial Goal</h3>
+
+<input id="goalName" placeholder="Goal name">
+<input id="goalAmount" type="number" placeholder="Target amount">
+
+<button onclick="saveGoal()" style="margin-top:10px;">
+Save Goal
+</button>
+
+<p id="goalStatus" style="margin-top:10px;"></p>
+
+<div class="progress-container">
+<div id="goalBar" class="progress-bar"></div>
+</div>
+</div>
+
+
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- ================= AI CHAT ================= -->
+<div id="aiChat" class="chat-container">
+
+<div class="chat-header">
+🤖 Finance AI Assistant
+<span onclick="toggleChat()">✕</span>
+</div>
+
+<div id="chatMessages" class="chat-messages">
+<div class="bot-msg">
+Hello 👋 I am your Finance AI. Ask me anything!
+</div>
+</div>
+
+<div class="chat-input">
+<input id="chatInput" placeholder="Ask about your money...">
+<button onclick="sendMessage()">Send</button>
+</div>
+
+</div>
+
+<!-- ================= LOGOUT MODAL ================= -->
+<div id="logoutModal" class="modal">
+<div class="modal-box">
+<h3>Confirm Logout</h3>
+<p style="opacity:.7;font-size:14px">
+Are you sure you want to logout?
+</p>
+<div class="modal-actions">
+<button onclick="confirmLogout()">Yes, Logout</button>
+<button onclick="closeLogoutModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
