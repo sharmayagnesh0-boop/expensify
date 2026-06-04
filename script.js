@@ -1,3 +1,8 @@
+/* ================= DATA & AUTHENTICATION ================= */
+    let data = [];
+    let analysisChartInstance = null;
+    let categoryChartInstance = null;
+    const currency = localStorage.getItem("currency") || "₹";
 document.addEventListener("DOMContentLoaded", async () => {
     /* ================= SUPABASE SETUP ================= */
     const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co'; 
