@@ -397,8 +397,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("filterType")?.addEventListener("change", renderTransactions);
 
    /* ================= ANALYTICS CHARTS ================= */
-    let analysisChartInstance = null;
-    let categoryChartInstance = null;
+    
 
     function renderAnalytics() {
         if (!document.getElementById("analysisChart")) return;
