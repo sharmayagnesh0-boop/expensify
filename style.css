@@ -6,6 +6,9 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
+}
+
+button, .transaction-item, .sidebar li, .card, .glass-box {
     transition: all 0.25s ease;
 }
 
@@ -14,6 +17,7 @@ body {
     background: #020617;
     color: white;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Background Glows */
@@ -166,6 +170,7 @@ button {
 }
 
 .budget-header { display: flex; justify-content: space-between; align-items: center; }
+
 /* ======================
    TRANSACTION PAGE
 ====================== */
@@ -186,7 +191,6 @@ border-radius:14px;
 background:rgba(255,255,255,0.05);
 border:1px solid rgba(255,255,255,0.08);
 backdrop-filter:blur(20px);
-transition:.3s;
 }
 
 .transaction-item:hover{
@@ -231,6 +235,7 @@ text-align:center;
 opacity:.6;
 margin-top:40px;
 }
+
 /* ======================
    EDIT MODAL
 ====================== */
@@ -272,6 +277,7 @@ color:white;
 display:flex;
 gap:10px;
 }
+
 /* ================= LIGHT MODE COMPLETE FIX ================= */
 
 body.light {
@@ -330,6 +336,7 @@ body.light .modal-box {
     background: rgba(255,255,255,0.95);
     color: #020617;
 }
+
 /* ================= AI CHATBOT ================= */
 
 #aiBtn{
@@ -409,6 +416,7 @@ background:#38bdf8;
 padding:10px 15px;
 cursor:pointer;
 }
+
 /* ================= SMART HEADER ================= */
 
 .smart-header h2{
@@ -420,6 +428,7 @@ margin-bottom:5px;
 font-size:13px;
 opacity:.7;
 }
+
 /* ================= NOTIFICATIONS ================= */
 
 #notifyBtn{
@@ -462,16 +471,15 @@ animation:fadePage .4s ease;
 from{opacity:0;transform:translateY(15px);}
 to{opacity:1;}
 }
+
 /* ======================
    MOBILE / ANDROID RESPONSIVENESS
 ====================== */
 @media (max-width: 768px) {
-    /* Stack the main layout instead of side-by-side */
     .dashboard {
         flex-direction: column;
     }
 
-    /* Convert the sidebar into a scrollable top navigation */
     .sidebar {
         width: 100%;
         height: auto;
@@ -484,7 +492,7 @@ to{opacity:1;}
     
     .sidebar ul {
         display: flex;
-        overflow-x: auto; /* Allows horizontal swiping */
+        overflow-x: auto;
         gap: 10px;
         padding-bottom: 5px;
     }
@@ -496,24 +504,20 @@ to{opacity:1;}
         font-size: 14px;
     }
 
-    /* Adjust main content padding */
     .main {
         padding: 20px 5%;
     }
 
-    /* Stack summary cards vertically */
     .cards {
         flex-direction: column;
         gap: 15px;
     }
 
-    /* Make grids single-column */
     .dashboard-grid, 
     .quick-add-grid {
         grid-template-columns: 1fr;
     }
 
-    /* Ensure inputs fit the screen */
     .input-field.full-width {
         grid-column: 1; 
     }
@@ -522,7 +526,6 @@ to{opacity:1;}
         grid-column: 1;
     }
 
-    /* Adjust the AI Chatbot for mobile */
     .chat-container {
         width: 90%;
         right: 5%;
