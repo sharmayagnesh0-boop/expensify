@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     /* ================= SUPABASE SETUP ================= */
-    const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
+    const SUPABASE_URL = 'https://YOUR-PROJECT-URL.supabase.co'; // Don't forget to paste yours!
+    const SUPABASE_KEY = 'YOUR-ANON-KEY'; // Don't forget to paste yours!
     
     // Ensure the Supabase library was added to the HTML
     if (!window.supabase) {
@@ -76,43 +76,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             location.reload();
         };
 
-       window.resetData = async () => {
-    if (confirm("Warning: This will delete all your transactions permanently. Continue?")) {
-        try {
-            // 1. Verify user session
-            const { data: { user }, error: authError } = await supabase.auth.getUser();
-            if (authError || !user) throw new Error("Could not verify user session.");
+        window.resetData = async () => {
+            if (confirm("Warning: This will delete all your transactions permanently. Continue?")) {
+                try {
+                    // 1. Verify user session
+                    const { data: { user }, error: authError } = await supabase.auth.getUser();
+                    if (authError || !user) throw new Error("Could not verify user session.");
 
-            // 2. Delete from DB and actively catch errors
-            const { error: deleteError } = await supabase
-                .from('transactions')
-                .delete()
-                .eq('user_id', user.id);
-            
-            if (deleteError) throw deleteError;
+                    // 2. Delete from DB and actively catch errors
+                    const { error: deleteError } = await supabase
+                        .from('transactions')
+                        .delete()
+                        .eq('user_id', user.id);
+                    
+                    if (deleteError) throw deleteError;
 
-            // 3. Clear ONLY your app's specific UI preferences
-            // This prevents wiping out the crucial Supabase auth tokens
-            localStorage.removeItem("budget");
-            localStorage.removeItem("goalName");
-            localStorage.removeItem("goalAmount");
-            localStorage.removeItem("currency");
+                    // 3. Clear ONLY your app's specific UI preferences
+                    // This prevents wiping out the crucial Supabase auth tokens
+                    localStorage.removeItem("budget");
+                    localStorage.removeItem("goalName");
+                    localStorage.removeItem("goalAmount");
+                    localStorage.removeItem("currency");
 
-            // 4. Clear the active arrays and update UI dynamically
-            data = [];
-            updateAllUI();
-            
-            alert("All data cleared successfully.");
-            
-            // Stay on dashboard instead of kicking to home
-            window.location.href = "index.html"; 
+                    // 4. Clear the active arrays and update UI dynamically
+                    data = [];
+                    updateAllUI();
+                    
+                    alert("All data cleared successfully.");
+                    
+                    // Stay on dashboard instead of kicking to home
+                    window.location.href = "index.html"; 
 
-        } catch (error) {
-            console.error("Reset Error:", error);
-            alert("Failed to delete data: " + error.message);
-        }
-    }
-};
+                } catch (error) {
+                    console.error("Reset Error:", error);
+                    alert("Failed to delete data: " + error.message);
+                }
+            }
+        };
     }
 
     /* ================= LOGOUT ================= */
