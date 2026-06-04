@@ -422,6 +422,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
             `Income: ${currency}${inc}\nExpense: ${currency}${exp}\nSavings: ${currency}${inc - exp}`;
 
         // 3. Safely try to draw the charts without breaking the app if they fail
+        // 3. Safely try to draw the charts
         try {
             if (analysisChartInstance) analysisChartInstance.destroy();
             analysisChartInstance = new Chart(document.getElementById("analysisChart"), {
@@ -434,7 +435,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
                         borderWidth: 0
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                // Removed maintainAspectRatio so the chart naturally sizes itself
+                options: { responsive: true } 
             });
 
             if (document.getElementById("categoryChart")) {
@@ -449,11 +451,12 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
                             backgroundColor: "#38bdf8"
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    // Removed maintainAspectRatio here too
+                    options: { responsive: true }
                 });
             }
         } catch (error) {
-            console.error("Chart rendering failed. This is often caused by an AdBlocker blocking the Chart.js CDN.", error);
+            console.error("Chart rendering failed:", error);
         }
     }
     /* ================= AI CHAT ASSISTANT ================= */
