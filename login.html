@@ -149,14 +149,14 @@ transition:.3s;
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 1. Initialize Supabase with your actual keys
-  const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 1. Initialize Supabase (Using unique variable names to prevent collisions)
+  const DB_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co';
+  const DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
+  const supabaseClient = window.supabase.createClient(DB_URL, DB_KEY);
 
   // Auto-redirect if already logged in
   window.onload = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) window.location = "index.html";
   };
 
@@ -175,7 +175,7 @@ transition:.3s;
     errorEl.innerText = "Creating account...";
     errorEl.style.color = "#38bdf8";
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
       email: email,
       password: pass,
     });
@@ -205,7 +205,7 @@ transition:.3s;
     errorEl.innerText = "Authenticating...";
     errorEl.style.color = "#38bdf8";
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: pass,
     });
