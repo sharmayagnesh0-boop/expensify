@@ -3,15 +3,15 @@
 <head>
 <title>Transactions</title>
 <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
+<script>if(localStorage.getItem("theme") === "true") document.body.classList.add("light");</script>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <div class="sidebar">
 <h2>Expensify</h2>
 <ul>
@@ -22,12 +22,10 @@
 </ul>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
 <h1>💳 Transactions Center</h1>
 
-<!-- SUMMARY -->
 <div class="cards">
 <div class="card">
 <h3>Total Transactions</h3>
@@ -45,7 +43,6 @@
 </div>
 </div>
 
-<!-- SEARCH + FILTER -->
 <div class="glass-box">
 
 <input 
@@ -62,14 +59,13 @@ style="width:60%;margin-right:10px">
 </div>
 
 
-<!-- LIST -->
-<button onclick="exportData()">⬇ Export CSV</button>
+<button onclick="exportData()" style="margin-top: 20px;">⬇ Export CSV</button>
 
 </div>
 </div>
 
 <script src="script.js"></script>
-<!-- EDIT MODAL -->
+
 <div id="editModal" class="modal">
 
 <div class="modal-box">
@@ -96,7 +92,6 @@ style="width:60%;margin-right:10px">
 
 </div>
 </div>
-<!-- ================= LOGOUT MODAL ================= -->
 
 <div id="logoutModal" class="modal">
   <div class="modal-box">
