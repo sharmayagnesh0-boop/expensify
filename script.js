@@ -1,20 +1,107 @@
-document.addEventListener("DOMContentLoaded", () => {
-    /* ================= DATA ================= */
-    let data = JSON.parse(localStorage.getItem("finovaPro")) || [];
+document.addEventListener("DOMContentLoaded", async () => {
+    /* ================= SUPABASE SETUP ================= */
+    const SUPABASE_URL = 'https://YOUR-PROJECT-URL.supabase.co';
+    const SUPABASE_KEY = 'YOUR-ANON-KEY';
+    
+    // Ensure the Supabase library was added to the HTML
+    if (!window.supabase) {
+        console.error("Supabase library is missing. Add the CDN script to your HTML.");
+        return;
+    }
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    /* ================= DATA & AUTHENTICATION ================= */
+    let data = [];
     const currency = localStorage.getItem("currency") || "₹";
 
-    const save = () => localStorage.setItem("finovaPro", JSON.stringify(data));
+    // Check authentication status on page load
+    const { data: authData } = await supabase.auth.getSession();
+    
+    // Redirect to login if user is not authenticated (and not already on login/home pages)
+    if (!authData.session && !window.location.href.includes("login.html") && !window.location.href.includes("home.html")) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Fetch data if user is logged in
+    if (authData.session && !window.location.href.includes("login.html") && !window.location.href.includes("home.html")) {
+        await fetchTransactions();
+    }
+
+    async function fetchTransactions() {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        // Fetch from Supabase, newest first
+        const { data: fetchedData, error } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('date', { ascending: false });
+
+        if (!error) {
+            data = fetchedData || [];
+            updateAllUI();
+        } else {
+            console.error("Error fetching database data:", error);
+        }
+    }
+
+    function updateAllUI() {
+        updateDashboard();
+        updateScores();
+        updateGoalProgress();
+        renderTransactions();
+        renderAnalytics();
+    }
+
+    /* ================= THEME & SETTINGS ================= */
+    if (localStorage.getItem("theme") === "true") {
+        document.body.classList.add("light");
+    }
+
+    window.toggleTheme = () => {
+        const isLight = document.body.classList.toggle("light");
+        localStorage.setItem("theme", isLight);
+    };
+
+    if (document.getElementById("budgetInput")) {
+        document.getElementById("budgetInput").value = localStorage.getItem("budget") || "";
+        document.getElementById("currencySelect").value = currency;
+
+        window.saveSettings = () => {
+            localStorage.setItem("budget", document.getElementById("budgetInput").value);
+            localStorage.setItem("currency", document.getElementById("currencySelect").value);
+            alert("Settings Updated");
+            location.reload();
+        };
+
+        window.resetData = async () => {
+            if (confirm("Warning: This will delete all your data permanently. Continue?")) {
+                const { data: { user } } = await supabase.auth.getUser();
+                await supabase.from('transactions').delete().eq('user_id', user.id);
+                localStorage.clear();
+                location.href = "home.html";
+            }
+        };
+    }
+
+    /* ================= LOGOUT ================= */
+    window.logout = async () => {
+        await supabase.auth.signOut();
+        localStorage.removeItem("auth");
+        window.location.href = "home.html";
+    };
 
     /* ================= EXPORT CSV ================= */
     window.exportData = () => {
-        let currentData = JSON.parse(localStorage.getItem("finovaPro")) || [];
-        if(currentData.length === 0){
+        if (data.length === 0) {
             alert("No transactions to export.");
             return;
         }
 
         let csv = "Name,Amount,Date\n";
-        currentData.forEach(t => {
+        data.forEach(t => {
             csv += `"${t.text}",${t.amount},"${t.date}"\n`;
         });
 
@@ -29,81 +116,146 @@ document.addEventListener("DOMContentLoaded", () => {
         URL.revokeObjectURL(url);
     };
 
-    /* ================= THEME SYSTEM ================= */
-    if(localStorage.getItem("theme")==="true"){
-        document.body.classList.add("light");
-    }
-
-    window.toggleTheme = () => {
-        const isLight = document.body.classList.toggle("light");
-        localStorage.setItem("theme", isLight);
-    };
-
-    /* ================= DASHBOARD CORE ================= */
-    window.addTransaction = () => {
+    /* ================= DASHBOARD CORE (INSERT / UPDATE / DELETE) ================= */
+    window.addTransaction = async () => {
         const text = document.getElementById("text")?.value.trim();
         let amount = Number(document.getElementById("amount")?.value);
         const category = document.getElementById("category")?.value;
 
-        if(!text || !amount){
+        if (!text || !amount) {
             alert("Fill all fields");
             return;
         }
 
-        data.push({
-            text:`${category} ${text}`,
-            amount:amount,
-            date:new Date().toLocaleDateString()
-        });
+        const { data: { user } } = await supabase.auth.getUser();
+        const dateStr = new Date().toLocaleDateString();
+        const fullText = `${category} ${text}`;
 
-        save();
-        updateDashboard();
-        renderTransactions();
-        updateScores();
-        updateGoalProgress();
+        const { data: insertedData, error } = await supabase
+            .from('transactions')
+            .insert([{ 
+                user_id: user.id, 
+                text: fullText, 
+                amount: amount, 
+                date: dateStr 
+            }])
+            .select();
 
-        document.getElementById("text").value="";
-        document.getElementById("amount").value="";
+        if (!error) {
+            data.unshift(insertedData[0]); // Add to beginning of array
+            updateAllUI();
+            document.getElementById("text").value = "";
+            document.getElementById("amount").value = "";
+        } else {
+            alert("Error saving transaction to database.");
+            console.error(error);
+        }
     };
 
-    function updateDashboard(){
-        if(!document.getElementById("balance")) return;
+    window.deleteTransaction = async (i) => {
+        const transactionId = data[i].id; 
+        
+        const { error } = await supabase
+            .from('transactions')
+            .delete()
+            .eq('id', transactionId);
+        
+        if (!error) {
+            data.splice(i, 1);
+            updateAllUI();
+        } else {
+            alert("Error deleting transaction from database.");
+        }
+    };
 
-        let total=0,inc=0,exp=0;
+    let currentEditIndex = null;
 
-        data.forEach(t=>{
-            total+=t.amount;
-            t.amount>0 ? inc+=t.amount : exp+=Math.abs(t.amount);
+    window.openEditModal = (i) => {
+        currentEditIndex = i;
+        const t = data[i];
+        const rawText = t.text.substring(3).trim(); 
+        
+        document.getElementById("editText").value = rawText;
+        document.getElementById("editAmount").value = Math.abs(t.amount);
+        document.getElementById("editModal").style.display = "flex";
+    };
+
+    window.closeModal = () => {
+        document.getElementById("editModal").style.display = "none";
+    };
+
+    window.updateTransaction = async () => {
+        if (currentEditIndex === null) return;
+
+        const text = document.getElementById("editText").value.trim();
+        let amount = Number(document.getElementById("editAmount").value);
+        const category = document.getElementById("editCategory").value;
+        const transactionId = data[currentEditIndex].id;
+
+        if (!text || !amount) {
+            alert("Fields cannot be empty");
+            return;
+        }
+
+        if (data[currentEditIndex].amount < 0) {
+            amount = -Math.abs(amount);
+        }
+
+        const newText = `${category} ${text}`;
+
+        const { error } = await supabase
+            .from('transactions')
+            .update({ text: newText, amount: amount })
+            .eq('id', transactionId);
+
+        if (!error) {
+            data[currentEditIndex].text = newText;
+            data[currentEditIndex].amount = amount;
+            closeModal();
+            updateAllUI();
+        } else {
+            alert("Error updating transaction in database.");
+        }
+    };
+
+    /* ================= STATS & CALCULATIONS ================= */
+    function updateDashboard() {
+        if (!document.getElementById("balance")) return;
+
+        let total = 0, inc = 0, exp = 0;
+
+        data.forEach(t => {
+            total += t.amount;
+            t.amount > 0 ? inc += t.amount : exp += Math.abs(t.amount);
         });
 
-        document.getElementById("balance").innerText=`${currency}${total}`;
-        document.getElementById("income").innerText=`${currency}${inc}`;
-        document.getElementById("expense").innerText=`${currency}${exp}`;
+        document.getElementById("balance").innerText = `${currency}${total}`;
+        document.getElementById("income").innerText = `${currency}${inc}`;
+        document.getElementById("expense").innerText = `${currency}${exp}`;
 
         updateBudget(exp);
     }
 
-    /* ================= BUDGET & GOALS ================= */
-    function updateBudget(exp){
-        const budget=Number(localStorage.getItem("budget"))||0;
-        const bar=document.getElementById("progressBar");
-        const percent=document.getElementById("budgetPercent");
-        const status=document.getElementById("budgetStatus");
+    function updateBudget(exp) {
+        const budget = Number(localStorage.getItem("budget")) || 0;
+        const bar = document.getElementById("progressBar");
+        const percent = document.getElementById("budgetPercent");
+        const status = document.getElementById("budgetStatus");
 
-        if(!bar) return;
+        if (!bar) return;
 
-        if(!budget){
-            bar.style.width="0%";
-            percent.innerText="0%";
-            status.innerText="Set limit in settings.";
+        if (!budget) {
+            bar.style.width = "0%";
+            percent.innerText = "0%";
+            status.innerText = "Set limit in settings.";
             return;
         }
 
-        let p=Math.min((exp/budget)*100,100);
-        bar.style.width=p+"%";
-        percent.innerText=Math.round(p)+"%";
+        let p = Math.min((exp / budget) * 100, 100);
+        bar.style.width = p + "%";
+        percent.innerText = Math.round(p) + "%";
 
-        status.innerText = p>=100 ? "⚠ Budget Exceeded!" : p>=75 ? "⚠ Almost at limit" : "You are within budget 👍";
+        status.innerText = p >= 100 ? "⚠ Budget Exceeded!" : p >= 75 ? "⚠ Almost at limit" : "You are within budget 👍";
     }
 
     window.saveGoal = () => {
@@ -135,16 +287,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let savings = 0;
         data.forEach(t => savings += t.amount);
-        if(savings < 0) savings = 0;
+        if (savings < 0) savings = 0;
 
         let progressPercent = Math.min((savings / target) * 100, 100);
         gBar.style.width = progressPercent + "%";
         gStatus.innerText = `${name}: ${currency}${savings} / ${currency}${target} (${Math.round(progressPercent)}%)`;
     }
 
-    /* ================= STREAK & SCORE ================= */
     function updateScores() {
-        if(!document.getElementById("financeScore")) return;
+        if (!document.getElementById("financeScore")) return;
         
         let totalIn = 0, totalOut = 0;
         data.forEach(t => t.amount > 0 ? totalIn += t.amount : totalOut += Math.abs(t.amount));
@@ -158,10 +309,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         document.getElementById("financeScore").innerText = `${score}/100`;
-        document.getElementById("streak").innerText = data.length > 0 ? "Local Sync Active" : "0 Days";
+        document.getElementById("streak").innerText = data.length > 0 ? "Live DB Active" : "0 Days";
     }
 
-    /* ================= TRANSACTIONS (SEARCH, FILTER, EDIT, DELETE) ================= */
+    /* ================= TRANSACTIONS RENDERER ================= */
     function renderTransactions() {
         if (!document.getElementById("totalCount")) return;
 
@@ -216,181 +367,103 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("searchInput")?.addEventListener("input", renderTransactions);
     document.getElementById("filterType")?.addEventListener("change", renderTransactions);
 
-    window.deleteTransaction = (i) => {
-        data.splice(i,1);
-        save();
-        renderTransactions();
-        updateDashboard();
-        updateScores();
-        updateGoalProgress();
-    };
+    /* ================= ANALYTICS CHARTS ================= */
+    let analysisChartInstance = null;
+    let categoryChartInstance = null;
 
-    let currentEditIndex = null;
-
-    window.openEditModal = (i) => {
-        currentEditIndex = i;
-        const t = data[i];
-        const rawText = t.text.substring(3).trim(); 
+    function renderAnalytics() {
+        if (!document.getElementById("analysisChart")) return;
         
-        document.getElementById("editText").value = rawText;
-        document.getElementById("editAmount").value = Math.abs(t.amount);
-        document.getElementById("editModal").style.display = "flex";
-    };
+        let inc = 0, exp = 0, categories = {};
 
-    window.closeModal = () => {
-        document.getElementById("editModal").style.display = "none";
-    };
-
-    window.updateTransaction = () => {
-        if (currentEditIndex === null) return;
-
-        const text = document.getElementById("editText").value.trim();
-        let amount = Number(document.getElementById("editAmount").value);
-        const category = document.getElementById("editCategory").value;
-
-        if (!text || !amount) {
-            alert("Fields cannot be empty");
-            return;
-        }
-
-        if (data[currentEditIndex].amount < 0) {
-            amount = -Math.abs(amount);
-        }
-
-        data[currentEditIndex].text = `${category} ${text}`;
-        data[currentEditIndex].amount = amount;
-
-        save();
-        closeModal();
-        renderTransactions();
-        updateDashboard();
-        updateScores();
-        updateGoalProgress();
-    };
-
-    /* ================= ANALYTICS ================= */
-    if(document.getElementById("analysisChart")){
-        let inc=0,exp=0,categories={};
-
-        data.forEach(t=>{
-            if(t.amount>0) inc+=t.amount;
-            else{
-                let v=Math.abs(t.amount);
-                exp+=v;
-                let cat=t.text.split(" ")[0];
-                categories[cat]=(categories[cat]||0)+v;
+        data.forEach(t => {
+            if (t.amount > 0) inc += t.amount;
+            else {
+                let v = Math.abs(t.amount);
+                exp += v;
+                let cat = t.text.split(" ")[0];
+                categories[cat] = (categories[cat] || 0) + v;
             }
         });
 
-        new Chart(document.getElementById("analysisChart"),{
-            type:"doughnut",
-            data:{
-                labels:["Income","Expense"],
-                datasets:[{
-                    data:[inc,exp],
-                    backgroundColor:["#22c55e","#ef4444"]
+        // Destroy previous charts before redrawing to prevent overlap bugs
+        if (analysisChartInstance) analysisChartInstance.destroy();
+        analysisChartInstance = new Chart(document.getElementById("analysisChart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Income", "Expense"],
+                datasets: [{
+                    data: [inc, exp],
+                    backgroundColor: ["#22c55e", "#ef4444"]
                 }]
             }
         });
 
-        if(document.getElementById("categoryChart")){
-            new Chart(document.getElementById("categoryChart"),{
-                type:"bar",
-                data:{
-                    labels:Object.keys(categories),
-                    datasets:[{
-                        label:"Spending",
-                        data:Object.values(categories)
+        if (document.getElementById("categoryChart")) {
+            if (categoryChartInstance) categoryChartInstance.destroy();
+            categoryChartInstance = new Chart(document.getElementById("categoryChart"), {
+                type: "bar",
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: "Spending",
+                        data: Object.values(categories)
                     }]
                 }
             });
         }
 
-        document.getElementById("monthlyReport").innerText=
-        `Income: ${currency}${inc}\nExpense: ${currency}${exp}\nSavings: ${currency}${inc-exp}`;
+        document.getElementById("monthlyReport").innerText =
+            `Income: ${currency}${inc}\nExpense: ${currency}${exp}\nSavings: ${currency}${inc - exp}`;
     }
 
-    /* ================= SETTINGS ================= */
-    if(document.getElementById("budgetInput")){
-        document.getElementById("budgetInput").value=localStorage.getItem("budget")||"";
-        document.getElementById("currencySelect").value=currency;
-
-        window.saveSettings=()=>{
-            localStorage.setItem("budget",document.getElementById("budgetInput").value);
-            localStorage.setItem("currency",document.getElementById("currencySelect").value);
-            alert("Settings Updated");
-            location.reload();
-        };
-
-        window.resetData=()=>{
-            if(confirm("Delete all data?")){
-                localStorage.removeItem("finovaPro");
-                localStorage.removeItem("goalName");
-                localStorage.removeItem("goalAmount");
-                location.href="home.html";
-            }
-        };
-    }
-
-    /* ================= AI ASSISTANT ================= */
-    window.toggleChat=()=>{
-        const chat=document.getElementById("aiChat");
-        if(!chat) return;
-        chat.style.display= chat.style.display==="flex" ? "none" : "flex";
+    /* ================= AI CHAT ASSISTANT ================= */
+    window.toggleChat = () => {
+        const chat = document.getElementById("aiChat");
+        if (!chat) return;
+        chat.style.display = chat.style.display === "flex" ? "none" : "flex";
     };
 
-    window.sendMessage=()=>{
-        const input=document.getElementById("chatInput");
-        const msg=input.value.trim();
-        if(!msg) return;
+    window.sendMessage = () => {
+        const input = document.getElementById("chatInput");
+        const msg = input.value.trim();
+        if (!msg) return;
 
-        addMessage(msg,"user-msg");
-        input.value="";
+        addMessage(msg, "user-msg");
+        input.value = "";
 
-        setTimeout(()=>{
-            addMessage(generateAIReply(msg),"bot-msg");
-        },500);
+        setTimeout(() => {
+            addMessage(generateAIReply(msg), "bot-msg");
+        }, 500);
     };
 
-    function addMessage(text,type){
-        const box=document.getElementById("chatMessages");
-        if(!box) return;
+    function addMessage(text, type) {
+        const box = document.getElementById("chatMessages");
+        if (!box) return;
 
-        const div=document.createElement("div");
-        div.className=type;
-        div.innerText=text;
+        const div = document.createElement("div");
+        div.className = type;
+        div.innerText = text;
 
         box.appendChild(div);
-        box.scrollTop=box.scrollHeight;
+        box.scrollTop = box.scrollHeight;
     }
 
-    function generateAIReply(message){
-        let income=0,expense=0;
+    function generateAIReply(message) {
+        let income = 0, expense = 0;
 
-        data.forEach(t=>{
-            t.amount>0 ? income+=t.amount : expense+=Math.abs(t.amount);
+        data.forEach(t => {
+            t.amount > 0 ? income += t.amount : expense += Math.abs(t.amount);
         });
 
-        const balance=income-expense;
-        message=message.toLowerCase();
+        const balance = income - expense;
+        message = message.toLowerCase();
 
-        if(message.includes("balance")) return `Your balance is ${currency}${balance}`;
-        if(message.includes("income")) return `Income total is ${currency}${income}`;
-        if(message.includes("expense")) return `Expenses are ${currency}${expense}`;
-        if(message.includes("save")) return balance>0 ? "You are saving money 👍" : "You are overspending.";
+        if (message.includes("balance")) return `Your balance is ${currency}${balance}`;
+        if (message.includes("income")) return `Income total is ${currency}${income}`;
+        if (message.includes("expense")) return `Expenses are ${currency}${expense}`;
+        if (message.includes("save")) return balance > 0 ? "You are saving money 👍" : "You are overspending.";
 
         return "Ask about balance, income, expenses or savings.";
     }
-
-    /* ================= LOGOUT ================= */
-    window.logout=()=>{
-        localStorage.removeItem("auth");
-        location.href="home.html";
-    };
-
-    /* ================= INITIALIZE DASHBOARD ================= */
-    updateDashboard();
-    updateScores();
-    updateGoalProgress();
-    renderTransactions();
 });
