@@ -10,6 +10,7 @@
 </head>
 
 <body>
+<script>if(localStorage.getItem("theme") === "true") document.body.classList.add("light");</script>
 
 <div class="dashboard">
 
@@ -39,7 +40,7 @@
 <canvas id="categoryChart"></canvas>
 </div>
 <div class="glass-box">
-<h3>📄 Monthly Report</h3>
+<h3>📅 Monthly Report</h3>
 <p id="monthlyReport">Loading...</p>
 </div>
 
@@ -49,7 +50,6 @@
 </div>
 
 <script src="script.js"></script>
-<!-- ================= LOGOUT MODAL ================= -->
 
 <div id="logoutModal" class="modal">
   <div class="modal-box">
