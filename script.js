@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     /* ================= SUPABASE SETUP ================= */
-    const SUPABASE_URL = 'https://YOUR-PROJECT-URL.supabase.co';
-    const SUPABASE_KEY = 'YOUR-ANON-KEY';
+    const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
     
     // Ensure the Supabase library was added to the HTML
     if (!window.supabase) {
