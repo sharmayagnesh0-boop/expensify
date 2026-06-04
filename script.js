@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     /* ================= SUPABASE SETUP ================= */
-   const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
+    const SUPABASE_URL = 'https://bpwfrhlwdjkowxjhrqys.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwd2ZyaGx3ZGprb3d4amhycXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjI1MDEsImV4cCI6MjA5NjEzODUwMX0.u12uVOAIuIPAh2NHWPSW--Kkp3nbR1gtXBdOLt4LsUw';
     
     // Ensure the Supabase library was added to the HTML
     if (!window.supabase) {
@@ -421,7 +421,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
         document.getElementById("monthlyReport").innerText =
             `Income: ${currency}${inc}\nExpense: ${currency}${exp}\nSavings: ${currency}${inc - exp}`;
 
-        // 3. Safely try to draw the charts without breaking the app if they fail
         // 3. Safely try to draw the charts
         try {
             if (analysisChartInstance) analysisChartInstance.destroy();
@@ -435,8 +434,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
                         borderWidth: 0
                     }]
                 },
-                // Removed maintainAspectRatio so the chart naturally sizes itself
-                options: { responsive: true } 
+                // Added maintainAspectRatio: false here
+                options: { responsive: true, maintainAspectRatio: false } 
             });
 
             if (document.getElementById("categoryChart")) {
@@ -451,14 +450,15 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
                             backgroundColor: "#38bdf8"
                         }]
                     },
-                    // Removed maintainAspectRatio here too
-                    options: { responsive: true }
+                    // Added maintainAspectRatio: false here too
+                    options: { responsive: true, maintainAspectRatio: false }
                 });
             }
         } catch (error) {
             console.error("Chart rendering failed:", error);
         }
     }
+
     /* ================= AI CHAT ASSISTANT ================= */
     window.toggleChat = () => {
         const chat = document.getElementById("aiChat");
