@@ -176,37 +176,66 @@ Modern Expense Tracker
 
 </div>
 
+<!-- Load Supabase Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+  // 1. Initialize Supabase
+  const SUPABASE_URL = 'https://YOUR-PROJECT-URL.supabase.co';
+  const SUPABASE_KEY = 'YOUR-ANON-KEY';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* Auto login */
-if(localStorage.getItem("auth")){
-window.location="index.html";
-}
+  // Auto-redirect if already logged in
+  window.onload = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) window.location = "index.html";
+  };
 
-function login(){
+  // 2. Sign Up Function
+  async function signUp() {
+    let email = document.getElementById("user").value.trim();
+    let pass = document.getElementById("pass").value.trim();
+    let errorEl = document.getElementById("error");
 
-let u=document.getElementById("user").value.trim();
-let p=document.getElementById("pass").value.trim();
+    errorEl.innerText = "Creating account...";
+    errorEl.style.color = "#38bdf8";
 
-if(u==="admin" && p==="1234"){
-    localStorage.setItem("username",u);
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: pass,
+    });
 
-localStorage.setItem("auth","true");
+    if (error) {
+      errorEl.innerText = error.message;
+      errorEl.style.color = "#ef4444";
+    } else {
+      errorEl.innerText = "Success! Logging you in...";
+      setTimeout(() => window.location = "index.html", 1000);
+    }
+  }
 
-/* smooth transition */
-document.body.style.opacity="0";
+  // 3. Login Function (Replaces your hardcoded admin check)
+  async function login() {
+    let email = document.getElementById("user").value.trim();
+    let pass = document.getElementById("pass").value.trim();
+    let errorEl = document.getElementById("error");
 
-setTimeout(()=>{
-window.location="index.html";
-},400);
+    errorEl.innerText = "Authenticating...";
+    errorEl.style.color = "#38bdf8";
 
-}else{
-document.getElementById("error").innerText="Invalid credentials";
-}
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: pass,
+    });
 
-}
-
+    if (error) {
+      errorEl.innerText = "Invalid credentials. Try again.";
+      errorEl.style.color = "#ef4444";
+    } else {
+      document.body.style.opacity = "0";
+      setTimeout(() => window.location = "index.html", 400);
+    }
+  }
 </script>
-
 </body>
 </html>
