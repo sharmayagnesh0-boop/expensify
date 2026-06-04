@@ -396,7 +396,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
     document.getElementById("searchInput")?.addEventListener("input", renderTransactions);
     document.getElementById("filterType")?.addEventListener("change", renderTransactions);
 
-    /* ================= ANALYTICS CHARTS ================= */
+   /* ================= ANALYTICS CHARTS ================= */
     let analysisChartInstance = null;
     let categoryChartInstance = null;
 
@@ -405,9 +405,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
         
         let inc = 0, exp = 0, categories = {};
 
+        // 1. Calculate the data
         data.forEach(t => {
-            if (t.amount > 0) inc += t.amount;
-            else {
+            if (t.amount > 0) {
+                inc += t.amount;
+            } else {
                 let v = Math.abs(t.amount);
                 exp += v;
                 let cat = t.text.split(" ")[0];
@@ -415,37 +417,45 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
             }
         });
 
-        // Destroy previous charts before redrawing to prevent overlap bugs
-        if (analysisChartInstance) analysisChartInstance.destroy();
-        analysisChartInstance = new Chart(document.getElementById("analysisChart"), {
-            type: "doughnut",
-            data: {
-                labels: ["Income", "Expense"],
-                datasets: [{
-                    data: [inc, exp],
-                    backgroundColor: ["#22c55e", "#ef4444"]
-                }]
-            }
-        });
-
-        if (document.getElementById("categoryChart")) {
-            if (categoryChartInstance) categoryChartInstance.destroy();
-            categoryChartInstance = new Chart(document.getElementById("categoryChart"), {
-                type: "bar",
-                data: {
-                    labels: Object.keys(categories),
-                    datasets: [{
-                        label: "Spending",
-                        data: Object.values(categories)
-                    }]
-                }
-            });
-        }
-
+        // 2. Update the text FIRST so it never gets stuck on "Loading..."
         document.getElementById("monthlyReport").innerText =
             `Income: ${currency}${inc}\nExpense: ${currency}${exp}\nSavings: ${currency}${inc - exp}`;
-    }
 
+        // 3. Safely try to draw the charts without breaking the app if they fail
+        try {
+            if (analysisChartInstance) analysisChartInstance.destroy();
+            analysisChartInstance = new Chart(document.getElementById("analysisChart"), {
+                type: "doughnut",
+                data: {
+                    labels: ["Income", "Expense"],
+                    datasets: [{
+                        data: [inc, exp],
+                        backgroundColor: ["#22c55e", "#ef4444"],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            if (document.getElementById("categoryChart")) {
+                if (categoryChartInstance) categoryChartInstance.destroy();
+                categoryChartInstance = new Chart(document.getElementById("categoryChart"), {
+                    type: "bar",
+                    data: {
+                        labels: Object.keys(categories),
+                        datasets: [{
+                            label: "Spending",
+                            data: Object.values(categories),
+                            backgroundColor: "#38bdf8"
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        } catch (error) {
+            console.error("Chart rendering failed. This is often caused by an AdBlocker blocking the Chart.js CDN.", error);
+        }
+    }
     /* ================= AI CHAT ASSISTANT ================= */
     window.toggleChat = () => {
         const chat = document.getElementById("aiChat");
